@@ -1,0 +1,80 @@
+"use client";
+import { useEffect, useState } from "react";
+
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { useDebouncedCallback } from "use-debounce";
+
+import css from "./page.module.css";
+import toast, { Toaster } from "react-hot-toast";
+import SearchBox from "@/components/SearchBox/SearchBox";
+import Pagination from "@/components/Pagination/Pagination";
+import Modal from "@/components/Modal/Modal";
+import NoteList from "@/components/NoteList/NoteList";
+import NoteForm from "@/components/NoteForm/NoteForm";
+import { Note } from "@/types/note";
+import { fetchNotes } from "@/lib/api";
+
+interface FetchNotesResponse {
+  notes: Note[];
+  totalPages: number;
+}
+
+interface NotesClientProps {
+  initialData: FetchNotesResponse;
+}
+
+function NotesClient({ initialData }: NotesClientProps) {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
+
+  const { data, isSuccess } = useQuery({
+    queryKey: ["notes", currentPage, searchQuery],
+    queryFn: () => fetchNotes(currentPage, searchQuery),
+    placeholderData: keepPreviousData,
+    initialData,
+  });
+
+  const updateSearchQuery = useDebouncedCallback((query) => {
+    setCurrentPage(1);
+    setSearchQuery(query);
+  }, 1000);
+
+  useEffect(() => {
+    if (data?.notes && data.notes.length === 0) {
+      toast.error("No notes found for your request");
+    }
+  }, [data]);
+
+  return (
+    <>
+      <div className={css.app}>
+        <header className={css.toolbar}>
+          <SearchBox value={searchQuery} onSearch={updateSearchQuery} />
+          {isSuccess && data.totalPages > 1 && (
+            <Pagination
+              totalPages={data.totalPages}
+              onPageChange={setCurrentPage}
+              currentPage={currentPage}
+            />
+          )}
+          <button className={css.button} onClick={openModal}>
+            Create note +
+          </button>
+        </header>
+      </div>
+      <Toaster position="top-right" />
+      {isSuccess && data?.notes && <NoteList notes={data?.notes} />}
+      {isModalOpen && (
+        <Modal onClose={closeModal}>
+          <NoteForm onClose={closeModal} />
+        </Modal>
+      )}
+    </>
+  );
+}
+
+export default NotesClient;
