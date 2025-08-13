@@ -1,4 +1,5 @@
 import { fetchNotes } from "@/lib/api";
+
 import NotesClient from "./Notes.client";
 
 type NotesPageProps = {
@@ -7,7 +8,7 @@ type NotesPageProps = {
 
 export default async function NotesPage({ params }: NotesPageProps) {
   const { slug } = await params;
-  const category = slug[0] === "all" ? undefined : slug[0];
-  // const notes = await fetchNotes(1);
-  // return <NotesClient initialData={notes} />;
+  const tag = slug[0] === "All" ? undefined : slug[0];
+  const notes = await fetchNotes(1, "", tag);
+  return <NotesClient initialData={notes} initialTag={tag} />;
 }

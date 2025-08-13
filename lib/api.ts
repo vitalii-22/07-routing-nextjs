@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { Category, NewNoteData, Note } from "../types/note";
+import type { NewNoteData, Note } from "../types/note";
 
 const myToken = process.env.NEXT_PUBLIC_NOTEHUB_TOKEN;
 
@@ -10,8 +10,8 @@ interface FetchNotesResponse {
 
 export const fetchNotes = async (
   page: number,
-  params: string = ""
-  // categoryId?: string
+  params: string = "",
+  tag?: string
 ): Promise<FetchNotesResponse> => {
   const response = await axios.get<FetchNotesResponse>(
     `https://notehub-public.goit.study/api/notes?`,
@@ -20,13 +20,15 @@ export const fetchNotes = async (
         page,
         perPage: 12,
         ...(params.trim() !== "" && { search: params }),
-        // categoryId,
+        tag: tag,
       },
       headers: {
         Authorization: `Bearer ${myToken}`,
       },
     }
   );
+
+  console.log(response.data);
 
   return response.data;
 };

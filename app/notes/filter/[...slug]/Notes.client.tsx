@@ -21,21 +21,24 @@ interface FetchNotesResponse {
 
 interface NotesClientProps {
   initialData: FetchNotesResponse;
+  initialTag?: string;
 }
 
-function NotesClient({ initialData }: NotesClientProps) {
+function NotesClient({ initialData, initialTag }: NotesClientProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [tag] = useState(initialTag);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
   const { data, isSuccess } = useQuery({
-    queryKey: ["notes", currentPage, searchQuery],
-    queryFn: () => fetchNotes(currentPage, searchQuery),
+    queryKey: ["notes", currentPage, searchQuery, tag],
+    queryFn: () => fetchNotes(currentPage, searchQuery, tag),
     placeholderData: keepPreviousData,
     initialData,
+    enabled: !(currentPage === 1 && searchQuery === ""),
   });
 
   const updateSearchQuery = useDebouncedCallback((query) => {

@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import css from "./TagsMenu.module.css";
 
-const categories: string[] = [
+export const tags: string[] = [
   "All",
   "Work",
   "Personal",
@@ -22,15 +22,17 @@ export default function TagsMenu() {
       <button onClick={toggle} className={css.menuButton}>
         Notes ▾
       </button>
-      <ul className={css.menuList}>
-        {categories.map((category) => (
-          <li key={category} className={css.menuItem}>
-            <Link href={`/notes/filter/${category}`} onClick={toggle}>
-              {category}
-            </Link>
-          </li>
-        ))}
-      </ul>
+      {isOpen && (
+        <ul className={css.menuList}>
+          {tags.map((tag) => (
+            <li key={tag} className={css.menuItem}>
+              <Link href={`/notes/filter/${tag}`} onClick={toggle}>
+                {tag}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
