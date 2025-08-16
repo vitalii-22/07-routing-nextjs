@@ -38,7 +38,6 @@ function NotesClient({ initialData, initialTag }: NotesClientProps) {
     queryFn: () => fetchNotes(currentPage, searchQuery, tag),
     placeholderData: keepPreviousData,
     initialData,
-    enabled: !(currentPage === 1 && searchQuery === ""),
   });
 
   const updateSearchQuery = useDebouncedCallback((query) => {
