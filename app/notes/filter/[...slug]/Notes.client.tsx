@@ -26,16 +26,16 @@ interface NotesClientProps {
 
 function NotesClient({ initialData, initialTag }: NotesClientProps) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [inputValue, setInputValue] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [tag] = useState(initialTag);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
   const { data, isSuccess } = useQuery({
-    queryKey: ["notes", currentPage, searchQuery, tag],
-    queryFn: () => fetchNotes(currentPage, searchQuery, tag),
+    queryKey: ["notes", currentPage, searchQuery, initialTag],
+    queryFn: () => fetchNotes(currentPage, searchQuery, initialTag),
     placeholderData: keepPreviousData,
     initialData,
   });
@@ -55,7 +55,13 @@ function NotesClient({ initialData, initialTag }: NotesClientProps) {
     <>
       <div className={css.app}>
         <header className={css.toolbar}>
-          <SearchBox value={searchQuery} onSearch={updateSearchQuery} />
+          <SearchBox
+            value={inputValue}
+            onSearch={(val) => {
+              setInputValue(val);
+              updateSearchQuery(val);
+            }}
+          />
           {isSuccess && data.totalPages > 1 && (
             <Pagination
               totalPages={data.totalPages}
