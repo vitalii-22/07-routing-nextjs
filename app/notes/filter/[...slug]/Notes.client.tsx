@@ -21,10 +21,10 @@ interface FetchNotesResponse {
 
 interface NotesClientProps {
   initialData: FetchNotesResponse;
-  initialTag?: string;
+  tag?: string;
 }
 
-function NotesClient({ initialData, initialTag }: NotesClientProps) {
+function NotesClient({ initialData, tag }: NotesClientProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [inputValue, setInputValue] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -34,8 +34,8 @@ function NotesClient({ initialData, initialTag }: NotesClientProps) {
   const closeModal = () => setIsModalOpen(false);
 
   const { data, isSuccess } = useQuery({
-    queryKey: ["notes", currentPage, searchQuery, initialTag],
-    queryFn: () => fetchNotes(currentPage, searchQuery, initialTag),
+    queryKey: ["notes", currentPage, searchQuery, tag],
+    queryFn: () => fetchNotes(currentPage, searchQuery, tag),
     placeholderData: keepPreviousData,
     initialData,
   });
@@ -44,6 +44,12 @@ function NotesClient({ initialData, initialTag }: NotesClientProps) {
     setCurrentPage(1);
     setSearchQuery(query);
   }, 1000);
+
+  useEffect(() => {
+    setSearchQuery("");
+    setInputValue("");
+    setCurrentPage(1);
+  }, [tag]);
 
   useEffect(() => {
     if (data?.notes && data.notes.length === 0) {

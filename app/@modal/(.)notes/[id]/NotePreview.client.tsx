@@ -1,17 +1,23 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import css from "./page.module.css";
 import { useQuery } from "@tanstack/react-query";
 import { fetchNoteById } from "@/lib/api";
 import Modal from "@/components/Modal/Modal";
+import Loader from "@/components/Loader/Loader";
+import ErrorMessage from "@/components/ErrorMessage/ErrorMessage";
 
 interface NotesPreviewProps {
   noteId: string;
 }
 
 const NotesPreview = ({ noteId }: NotesPreviewProps) => {
-  const { data: note } = useQuery({
+  const {
+    data: note,
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["note", noteId],
     queryFn: () => fetchNoteById(noteId),
     refetchOnMount: false,
@@ -22,6 +28,8 @@ const NotesPreview = ({ noteId }: NotesPreviewProps) => {
 
   return (
     <Modal onClose={close}>
+      {isLoading && <Loader />}
+      {isError && <ErrorMessage />}
       <div className={css.container}>
         <div className={css.item}>
           <div className={css.header}>
